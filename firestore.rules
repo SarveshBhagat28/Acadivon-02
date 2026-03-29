@@ -28,10 +28,8 @@ service cloud.firestore {
     //   - uid: string (required) - Owner's UID
     //   - title: string (required)
     //   - description: string (optional)
-    //   - dueDate: string (required)
-    //   - dueTime: string (required)
+    //   - deadline: timestamp (required)
     //   - priority: string (required)
-    //   - status: string (required)
     //
     // ===============================================================
 
@@ -53,7 +51,7 @@ service cloud.firestore {
     function isAdmin() {
       return isAuthenticated() &&
         (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
-          (request.auth.token.email == "bhagatsarvesh01@gmail.com" && request.auth.token.email_verified == true));
+          (request.auth.token.email == "bhagatsarvesh01@gmail.com"));
     }
 
     function isValidEmail(email) {
@@ -87,14 +85,11 @@ service cloud.firestore {
     }
 
     function isValidAssignment(data) {
-      return hasRequiredFields(['uid', 'title', 'dueDate', 'dueTime', 'priority', 'status']) &&
+      return hasRequiredFields(['uid', 'title', 'deadline', 'priority']) &&
              data.uid == request.auth.uid &&
              data.title is string && data.title.size() > 0 &&
-             data.dueDate is string && data.dueDate.size() > 0 &&
-             data.dueTime is string && data.dueTime.size() > 0 &&
-             data.priority in ['High', 'Medium', 'Low'] &&
-             data.status in ['pending', 'completed', 'overdue'] &&
-             (!('description' in data) || data.description is string);
+             data.deadline is timestamp &&
+             data.priority in ['High', 'Medium', 'Low'];
     }
 
     // ===============================================================

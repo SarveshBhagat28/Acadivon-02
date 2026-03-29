@@ -23,14 +23,19 @@ import { cn } from './lib/utils';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const { user, setUser, theme, resetStats, statsReset } = useStore();
+  const { user, setUser, theme, resetStats, statsReset, setStreak, streak } = useStore();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.username.toLowerCase() === 'sarvesh' && !statsReset) {
-      resetStats();
+    if (user?.username.toLowerCase() === 'sarvesh') {
+      if (!statsReset) {
+        resetStats();
+        setStreak(7);
+      } else if (streak < 7) {
+        setStreak(7);
+      }
     }
-  }, [user, statsReset, resetStats]);
+  }, [user, statsReset, resetStats, setStreak, streak]);
 
   useEffect(() => {
     // Fallback timeout to prevent infinite loading

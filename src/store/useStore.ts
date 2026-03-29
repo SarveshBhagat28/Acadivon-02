@@ -9,7 +9,8 @@ import {
   updateDoc, 
   query, 
   where, 
-  getDocs 
+  getDocs,
+  Timestamp
 } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firebaseUtils';
 
@@ -37,6 +38,7 @@ export interface Assignment {
   description: string;
   dueDate: string;
   dueTime: string;
+  deadline?: string | Timestamp;
   priority: 'High' | 'Medium' | 'Low';
   status: 'pending' | 'completed' | 'overdue';
 }
@@ -52,6 +54,7 @@ interface UserState {
   assignments: Assignment[];
   setUser: (user: User | null) => void;
   addXP: (amount: number) => void;
+  setStreak: (days: number) => void;
   setSchedule: (schedule: ClassSession[]) => void;
   fetchSchedule: (uid: string) => Promise<void>;
   updateClassStatus: (id: string, status: ClassSession['status']) => Promise<void>;
@@ -69,6 +72,7 @@ interface UserState {
   setTheme: (theme: 'dark' | 'light') => void;
   setVolume: (volume: number) => void;
   resetStats: () => void;
+  setStreak: (streak: number) => void;
 }
 
 export const useStore = create<UserState>()(
@@ -89,6 +93,7 @@ export const useStore = create<UserState>()(
       setTheme: (theme) => set({ theme }),
       setVolume: (volume) => set({ volume }),
       resetStats: () => set({ xp: 0, level: 1, streak: 0, rank: 'Rookie', statsReset: true }),
+      setStreak: (streak) => set({ streak }),
       addXP: (amount) =>
         set((state) => {
           const newXP = state.xp + amount;
@@ -178,7 +183,9 @@ export const useStore = create<UserState>()(
         if (!user) return;
 
         const id = Math.random().toString(36).substr(2, 9);
-        const newAssignment = { ...assignment, id, uid: user.uid, status: 'pending' as const };
+        const deadlineDate = new Date(`${assignment.dueDate}T${assignment.dueTime}:00Z`);
+        const deadline = Timestamp.fromDate(deadlineDate);
+        const newAssignment = { ...assignment, id, uid: user.uid, status: 'pending' as const, deadline };
         
         try {
           await setDoc(doc(db, 'assignments', id), newAssignment);
