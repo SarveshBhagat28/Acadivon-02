@@ -1,0 +1,59 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user metadata and preferences.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique identifier from Firebase Auth." },
+        "email": { "type": "string", "format": "email" },
+        "username": { "type": "string", "description": "Display name chosen by the user." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "username"]
+    },
+    "ScheduleItem": {
+      "title": "Timetable Entry",
+      "description": "A single class session in the user's timetable.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "uid": { "type": "string", "description": "Owner's UID." },
+        "name": { "type": "string", "description": "Subject name." },
+        "day": { "type": "string", "enum": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] },
+        "time": { "type": "string", "description": "Start time (HH:mm)." },
+        "status": { "type": "string", "enum": ["present", "absent", "late", "cancelled", "pending"] }
+      },
+      "required": ["uid", "name", "day", "time", "status"]
+    },
+    "Assignment": {
+      "title": "Assignment",
+      "description": "User's pending tasks and assignments.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "uid": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "deadline": { "type": "string", "format": "date-time" },
+        "priority": { "type": "string", "enum": ["High", "Medium", "Low"] },
+        "completed": { "type": "boolean" }
+      },
+      "required": ["uid", "title", "deadline", "priority"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "User",
+      "description": "Individual user profiles."
+    },
+    "/schedules/{scheduleId}": {
+      "schema": "ScheduleItem",
+      "description": "Global collection of schedule items, secured by uid."
+    },
+    "/assignments/{assignmentId}": {
+      "schema": "Assignment",
+      "description": "Global collection of assignments, secured by uid."
+    }
+  }
+}
