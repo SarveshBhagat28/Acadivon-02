@@ -1,11 +1,17 @@
 import { GoogleGenAI } from "@google/genai";
 
+let aiClient: GoogleGenAI | null = null;
+
 function getAiClient() {
+  if (aiClient) {
+    return aiClient;
+  }
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error("Gemini API key is not configured");
   }
-  return new GoogleGenAI({ apiKey });
+  aiClient = new GoogleGenAI({ apiKey });
+  return aiClient;
 }
 
 export async function generateQuizFromContent(content: string, difficulty: string, count: number) {
