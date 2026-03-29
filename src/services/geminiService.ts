@@ -1,8 +1,21 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let aiClient: GoogleGenAI | null = null;
+
+function getAiClient() {
+  if (aiClient) {
+    return aiClient;
+  }
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("Gemini API key is not configured");
+  }
+  aiClient = new GoogleGenAI({ apiKey });
+  return aiClient;
+}
 
 export async function generateQuizFromContent(content: string, difficulty: string, count: number) {
+  const ai = getAiClient();
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
@@ -28,6 +41,7 @@ Return ONLY the JSON array.`,
 }
 
 export async function getAITutorHelp(message: string, context?: string) {
+  const ai = getAiClient();
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
