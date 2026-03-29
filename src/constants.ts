@@ -1,1 +1,1 @@
-export const LOGO_URL = "https://picsum.photos/seed/acadivon-official-logo/800/800";
+export const LOGO_URL = "/logo.svg";
